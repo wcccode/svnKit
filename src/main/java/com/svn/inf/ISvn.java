@@ -139,4 +139,6 @@ public interface ISvn extends ISvnService {
 	public boolean doLock();
 
 	public boolean unLock();
+
+	public List<String> merge(String checkUrl, File file);
 }

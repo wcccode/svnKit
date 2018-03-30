@@ -1,20 +1,13 @@
 package com.svn.impl;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.wc.SVNDiffClient;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNStatus;
-import org.tmatesoft.svn.core.wc.SVNStatusType;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
+import org.tmatesoft.svn.core.wc.*;
 
 import com.svn.conf.ErrorVal;
 import com.svn.conf.SvnConfig;
@@ -275,6 +268,31 @@ public class SvnBaseImpl extends SvnServiceImpl implements ISvn {
 	public boolean unLock() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public List<String> merge(String checkUrl, File file) {
+		try {
+			if (file == null || !file.exists())
+				throw new Exception(ErrorVal.Path_no_having);
+			// 获取SVNDiffClient
+			SVNDiffClient diffClient = clientManager.getDiffClient();
+			diffClient.setIgnoreExternals(false);
+			StringOutputSteam os = new StringOutputSteam(new ArrayList<String>());
+
+			SVNRevisionRange rangeToMerge = new SVNRevisionRange(SVNRevision.create(4434), SVNRevision.create(4435));
+
+			diffClient.doMerge(SVNURL.parseURIEncoded(checkUrl), SVNRevision.HEAD, Collections.singleton(rangeToMerge), new File("E:\\git\\idea-workspace\\branch"), SVNDepth.INFINITY, true, false, false, false);
+
+			super.log("合并分支");
+			return os.s;
+		} catch (SVNException e) {
+			super.log(e);
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

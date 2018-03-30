@@ -1,6 +1,7 @@
 package com.svn;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,6 +12,7 @@ import com.svn.factory.DemoSvn;
 import com.svn.inf.ISvn;
 import com.svn.inf.service.ISvnDbLog;
 import com.svn.model.SvnRepoPojo;
+import com.troila.svn.tools.FileUtil;
 
 /**
  * 测试类
@@ -19,11 +21,12 @@ import com.svn.model.SvnRepoPojo;
  * @date 2016年8月8日
  */
 public class exmple {
-	String account = "allen";
-	String password = "123456";
-	String path = "http://192.168.1.xx/svn/abc";
-	String targetHead = "e:/测试";
+	String account = "";
+	String password = "";
+	String path = "http://svn/source/auto_merge";
+	String targetHead = "E:\\git\\idea-workspace\\test";
 	ISvn svn;
+	String[] strs = new String[] { targetHead +"/tt" , targetHead + "/tt/t.txt" };
 
 	/**
 	 * 样例
@@ -42,14 +45,20 @@ public class exmple {
 		svn.createSVNRepository();
 		// 得到基础操作对象
 		svn.createSVNClientManager();
+
 		/** 测试--Start-- **/
 		testGetRepo();
 		testCheckOut();
-		testAdd();
-		testDel();
+
+//		File tmpFile =	FileUtil.createNewFile(targetHead + strs[1]);
+//		FileOutputStream out = new FileOutputStream(tmpFile);
+//		out.write(12);
+	//	testAdd();
+//		testDel();
 		testCleanUp();
 		testUpdate();
 		testDiff();
+		testMerge();
 		/** 测试 --End-- **/
 		// 关闭库容器
 		svn.closeRepo();
@@ -74,7 +83,7 @@ public class exmple {
 	 */
 	
 	private void testCheckOut() {
-		svn.checkOut("xxx", targetHead);
+		svn.checkOut("http://svnerp.xiangyu.com/svn/source/auto_merge/trunk", targetHead);
 	}
 
 	/**
@@ -85,8 +94,8 @@ public class exmple {
 	 */
 	
 	private void testAdd() {
-		String[] strs = new String[] { targetHead + "/4/a/", targetHead + "/4/", targetHead + "/4/a/b/", targetHead + "/4/a/b/b.txt" };
-		svn.add(strs, "haha", false, new ISvnDbLog<String>() {
+
+		svn.add(strs, "这是一个提交测试测试测试", false, new ISvnDbLog<String>() {
 			@Override
 			public boolean addLog(String name, SvnConfig dbType, long versionId, File[] files) {
 				System.out.println("Add 到 DB 了");
@@ -109,8 +118,7 @@ public class exmple {
 	 */
 	
 	private void testDel() {
-		String[] strs = new String[] { targetHead + "/4/a/", targetHead + "/4/", targetHead + "/4/a/b/", targetHead + "/4/a/b/b.txt" };
-		svn.delete(strs, true, "haha", false, new ISvnDbLog<String>() {
+		svn.delete(strs, true, "删除测试测试", false, new ISvnDbLog<String>() {
 			@Override
 			public boolean addLog(String name, SvnConfig dbType, long versionId, File[] files) {
 				System.out.println("del 到 DB 了");
@@ -133,7 +141,7 @@ public class exmple {
 	 */
 	
 	private void testUpdate() {
-		String strs = targetHead + "/4/a/b/";
+		String strs = targetHead + "/";
 		svn.update(strs, "哈哈", false, new ISvnDbLog<String>() {
 			@Override
 			public boolean addLog(String name, SvnConfig dbType, long versionId, File[] files) {
@@ -157,15 +165,20 @@ public class exmple {
 	 */
 	
 	private void testDiff() {
-		String[] strs = new String[] { targetHead + "/4/a/b/" };
+		String[] strs = new String[] { targetHead + "/" };
 		List<String> s = svn.diffPath(new File(strs[0]));
 		for (String t : s)
 			System.out.println(t);
 	}
 
 	private void testCleanUp() {
-		String[] strs = new String[] { targetHead + "/4/a/b/" };
+		String[] strs = new String[] { targetHead + "/" };
 		svn.cleanUp(new File(strs[0]));
+	}
+
+	private void testMerge() {
+		String[] strs = new String[] { targetHead + "/" };
+		svn.merge("http://svnerp.xiangyu.com/svn/source/auto_merge/trunk", new File(strs[0]));
 	}
 
 	/**
